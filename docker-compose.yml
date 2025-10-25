@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: nutrition-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: nutrition
+      MYSQL_USER: nutrition_user
+      MYSQL_PASSWORD: nutrition_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - nutrition_network
+
+  # Node.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nutrition-app
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: mysql://nutrition_user:nutrition_password@mysql:3306/nutrition
+      JWT_SECRET: dev_secret_key_change_in_production
+      VITE_APP_TITLE: Calculadora Nutricional
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - nutrition_network
+    command: npm run dev
+
+  # Redis Cache (Opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: nutrition-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - nutrition_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  nutrition_network:
+    driver: bridge
+
