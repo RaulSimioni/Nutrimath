@@ -110,7 +110,7 @@ export default function Home() {
                 <span className="text-blue-600 font-bold text-lg">3</span>
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Defina Porções</h4>
-              <p className="text-gray-600 text-sm">Indique o tamanho da porcao em gramas</p>
+              <p className="text-gray-600 text-sm">Indique o tamanho da porções em gramas</p>
             </div>
             <div className="text-center">
               <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
